@@ -21,6 +21,15 @@ RUN apk update && \
 ARG CARGO_BUILD_PROFILE=debug
 ENV CARGO_BUILD_PROFILE ${CARGO_BUILD_PROFILE}
 
+ARG SCCACHE_GHA_ENABLED
+ARG ACTIONS_CACHE_URL
+ARG ACTIONS_RUNTIME_TOKEN
+
+# Activate sccache for Rust code
+ENV RUSTC_WRAPPER=/usr/bin/sccache
+# Disable incremental buildings, not supported by sccache
+ENV CARGO_INCREMENTAL=false
+
 RUN apk update && \
     apk --no-cache upgrade && \
     apk add --no-cache \
@@ -37,6 +46,7 @@ RUN apk update && \
         openssh-client \
         openssl-dev \
         python3 \
+        sccache \
         zeromq-dev
 
 RUN rustup toolchain install stable && \
