@@ -3,15 +3,14 @@
 # TODO(wasm-dpp): implement custom Docker image to build mixed projects with rust/wasm/JS
 # Image has to be based on `rust` image, have wasm-bindgen-cli and wasm32-unknown targets preinstalled
 # and also have `node` and `yarn` to build JS part of wasm-dpp
-FROM rust:alpine3.17 as builder
+FROM rust:alpine3.16 as builder
 
 ARG NODE_ENV=production
 ENV NODE_ENV ${NODE_ENV}
 
-RUN echo 'http://dl-cdn.alpinelinux.org/alpine/v3.16/main' >> /etc/apk/repositories
 RUN apk update && \
     apk --no-cache upgrade && \
-    apk add --no-cache nodejs=16.20.0-r0 npm && \
+    apk add --no-cache nodejs npm && \
     npm install -g npm@latest && \
     npm install -g corepack@latest && \
     corepack prepare yarn@stable --activate && \
