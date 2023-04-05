@@ -39,9 +39,6 @@ RUN apk update && \
         python3 \
         zeromq-dev
 
-RUN --mount=type=cache,target=target \
-    --mount=type=cache,target=$CARGO_HOME/git \
-    --mount=type=cache,target=$CARGO_HOME/registry \
-    rustup toolchain install stable && \
+RUN rustup toolchain install stable && \
     rustup target add wasm32-unknown-unknown --toolchain stable && \
     cargo install -f wasm-bindgen-cli
