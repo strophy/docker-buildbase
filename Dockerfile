@@ -42,5 +42,6 @@ RUN apk update && \
 RUN --mount=type=cache,target=target \
     --mount=type=cache,target=$CARGO_HOME/git \
     --mount=type=cache,target=$CARGO_HOME/registry \
-    rustup target add wasm32-unknown-unknown && \
+    rustup toolchain install stable && \
+    rustup target add wasm32-unknown-unknown --toolchain stable && \
     cargo install -f wasm-bindgen-cli
