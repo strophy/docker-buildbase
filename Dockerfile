@@ -10,13 +10,15 @@ ENV NODE_ENV ${NODE_ENV}
 
 RUN apk update && \
     apk --no-cache upgrade && \
-    apk add --no-cache nodejs npm && \
+    apk add --no-cache curl nodejs npm && \
     npm install -g npm@latest && \
     npm install -g corepack@latest && \
     corepack prepare yarn@stable --activate && \
     corepack enable
 
 # RUN yarn config set enableInlineBuilds true
+
+ARG TARGETARCH
 
 ARG CARGO_BUILD_PROFILE=debug
 ENV CARGO_BUILD_PROFILE ${CARGO_BUILD_PROFILE}
@@ -26,9 +28,17 @@ ARG ACTIONS_CACHE_URL
 ARG ACTIONS_RUNTIME_TOKEN
 
 # Activate sccache for Rust code
-ENV RUSTC_WRAPPER=/usr/bin/sccache
+ENV RUSTC_WRAPPER=/usr/local/bin/sccache
 # Disable incremental buildings, not supported by sccache
 ENV CARGO_INCREMENTAL=false
+
+# Install sccache for caching
+ENV SCCACHE_VERSION=0.4.1
+RUN if [[ "$TARGETARCH" == "arm64" ]] ; then export SCC_ARCH=aarch64; else export SCC_ARCH=x86_64; fi; \
+    curl -Ls \
+        https://github.com/mozilla/sccache/releases/download/v${SCCACHE_VERSION}/sccache-v${SCCACHE_VERSION}-${SCC_ARCH}-unknown-linux-musl.tar.gz | \
+        tar -C /tmp -xz && \
+        mv /tmp/sccache-*/sccache /usr/local/bin/
 
 RUN apk update && \
     apk --no-cache upgrade && \
@@ -46,7 +56,6 @@ RUN apk update && \
         openssh-client \
         openssl-dev \
         python3 \
-        sccache \
         zeromq-dev
 
 RUN rustup toolchain install stable && \
