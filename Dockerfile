@@ -1,6 +1,6 @@
 # syntax = docker/dockerfile:1.5
 
-FROM rust:alpine3.16 as builder
+FROM rust:alpine3.18 as builder
 
 # Install tools and deps
 RUN apk update && \
